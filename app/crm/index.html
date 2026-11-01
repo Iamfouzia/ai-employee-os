@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM — AI Employee OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14171F;
+    --ink-soft: #5B6172;
+    --ink-faint: #9297A6;
+    --paper: #F7F6F3;
+    --panel: #FFFFFF;
+    --line: #E3E1DA;
+    --line-strong: #D4D1C7;
+    --brass: #B98B3E;
+    --brass-deep: #92702E;
+    --brass-tint: #FBF2E2;
+    --teal: #2F7D6B;
+    --teal-tint: #E6F1EE;
+    --red: #B4432F;
+    --red-tint: #FBEBE7;
+    --blue: #35618F;
+    --blue-tint: #E9EFF6;
+    --violet: #6B4E8E;
+    --violet-tint: #F0EBF5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .disp { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.01em; }
+  .mono { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+
+  ::selection { background: var(--brass-tint); }
+
+  .app { display: grid; grid-template-columns: 234px 1fr; min-height: 100vh; }
+
+  .sidebar {
+    background: var(--ink);
+    color: #E7E6E2;
+    padding: 26px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    position: relative;
+  }
+  .sidebar::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0; width: 3px;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--brass) 0px, var(--brass) 3px,
+      transparent 3px, transparent 14px
+    );
+    opacity: 0.55;
+  }
+
+  .brand { display: flex; align-items: center; gap: 11px; padding-left: 4px; }
+  .brand .mark {
+    width: 30px; height: 30px; border-radius: 6px;
+    background: var(--brass);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; color: var(--ink);
+    flex-shrink: 0;
+  }
+  .brand .txt { line-height: 1.25; }
+  .brand .txt .l1 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14.5px; }
+  .brand .txt .l2 { font-size: 11px; color: #9297A6; letter-spacing: 0.02em; }
+
+  .nav { display: flex; flex-direction: column; gap: 1px; padding-left: 4px; }
+  .nav-item {
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #B7B9C2;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 7px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-item .idx { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6B7080; width: 16px; }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+  .nav-item.active { background: rgba(185,139,62,0.16); color: #F3E4C6; font-weight: 600; }
+  .nav-item.active .idx { color: var(--brass); }
+  .nav-item .count { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6B7080; }
+  .nav-item.active .count { color: #D8B876; }
+
+  .sidebar-footer { margin-top: auto; padding-left: 4px; font-size: 11.5px; color: #6B7080; line-height: 1.7; }
+  .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; }
+  .status-dot.ok { background: #4BA987; }
+  .status-dot.err { background: #C15B45; }
+  .status-dot.wait { background: #6B7080; }
+
+  .main { padding: 40px 46px; max-width: 1180px; }
+
+  .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; gap: 20px; flex-wrap: wrap; }
+  .page-header .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass-deep); margin-bottom: 6px; }
+  .page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 25px; font-weight: 700; }
+  .page-header p { color: var(--ink-soft); font-size: 13px; margin-top: 5px; max-width: 46ch; }
+
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.1s, background 0.15s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--ink); color: #fff; }
+  .btn-primary:hover { background: #262B38; }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); }
+  .btn-ghost:hover { border-color: var(--ink); }
+
+  .edit-link {
+    background: none; border: none; cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+    color: var(--brass-deep); padding: 0;
+  }
+  .edit-link:hover { text-decoration: underline; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-bottom: 36px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel); }
+  .stat-card { padding: 20px 22px; border-right: 1px solid var(--line); }
+  .stat-card:last-child { border-right: none; }
+  .stat-card .label { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  .stat-card .value { font-family: 'IBM Plex Mono', monospace; font-size: 30px; font-weight: 600; margin-top: 8px; letter-spacing: -0.01em; }
+  .stat-card .sub { font-size: 11.5px; color: var(--ink-faint); margin-top: 4px; }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .panel-head { padding: 16px 22px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  .panel-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 11px 22px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); font-weight: 600; border-bottom: 1px solid var(--line); }
+  td { padding: 13px 22px; border-bottom: 1px dashed var(--line); font-size: 13.5px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FCFBF8; }
+  .cell-name { font-weight: 600; }
+  .cell-muted { color: var(--ink-soft); }
+  .cell-mono { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-faint); }
+
+  .empty-state { padding: 50px 20px; text-align: center; color: var(--ink-faint); }
+  .empty-state .mark { font-family: 'IBM Plex Mono', monospace; font-size: 20px; margin-bottom: 10px; color: var(--line-strong); }
+  .empty-state p.t { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+  .empty-state p.s { font-size: 12.5px; margin-top: 3px; }
+
+  .pill { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .pill-new { background: var(--blue-tint); color: var(--blue); }
+  .pill-contacted { background: var(--brass-tint); color: var(--brass-deep); }
+  .pill-negotiation { background: var(--violet-tint); color: var(--violet); }
+  .pill-closed { background: var(--teal-tint); color: var(--teal); }
+  .pill-high { background: var(--red-tint); color: var(--red); }
+  .pill-medium { background: var(--brass-tint); color: var(--brass-deep); }
+  .pill-low { background: #EEEEEA; color: var(--ink-soft); }
+
+  .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .board-col { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; min-height: 200px; }
+  .board-col-head { padding: 13px 15px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; border-top: 3px solid; border-radius: 10px 10px 0 0; }
+  .board-col-head .title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 12.5px; }
+  .board-col-head .n { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); background: var(--paper); padding: 2px 7px; border-radius: 20px; }
+  .col-top-new { border-top-color: var(--blue); }
+  .col-top-contacted { border-top-color: var(--brass); }
+  .col-top-negotiation { border-top-color: var(--violet); }
+  .col-top-closed { border-top-color: var(--teal); }
+  .board-col-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .lead-card { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px 13px; }
+  .lead-card .lname { font-weight: 600; font-size: 13px; }
+  .lead-card .lmeta { font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; }
+  .lead-card select { margin-top: 8px; width: 100%; font-size: 11.5px; padding: 6px 7px; border-radius: 6px; border: 1px solid var(--line-strong); font-family: 'Inter'; background: #fff; }
+
+  .overlay { position: fixed; inset: 0; background: rgba(20,23,31,0.45); display: none; align-items: center; justify-content: center; z-index: 50; }
+  .overlay.show { display: flex; }
+  .modal { background: #fff; border-radius: 12px; width: 420px; max-width: 92vw; padding: 26px; box-shadow: 0 24px 70px rgba(20,23,31,0.28); border-top: 3px solid var(--brass); }
+  .modal h3 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; margin-bottom: 4px; }
+  .modal .hint { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 18px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 11.5px; font-weight: 600; margin-bottom: 6px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.03em; }
+  .field input, .field select {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--line-strong); border-radius: 7px;
+    font-family: 'Inter'; font-size: 13.5px; background: var(--paper); color: var(--ink);
+  }
+  .field input:focus, .field select:focus { outline: 2px solid var(--brass); outline-offset: 1px; border-color: transparent; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+  .modal-error { background: var(--red-tint); color: var(--red); font-size: 12.5px; padding: 9px 12px; border-radius: 7px; margin-bottom: 14px; display: none; }
+
+  .timeline-list { max-height: 280px; overflow-y: auto; margin-bottom: 18px; border: 1px solid var(--line); border-radius: 8px; }
+  .timeline-item { padding: 11px 14px; border-bottom: 1px dashed var(--line); }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-item-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .timeline-item-desc { font-size: 13px; margin-top: 6px; line-height: 1.45; }
+  .timeline-empty, .timeline-loading, .timeline-error { padding: 18px 14px; color: var(--ink-faint); font-size: 12.5px; }
+  .timeline-error { color: var(--red); }
+
+  .toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 8px;
+    font-size: 13px; font-weight: 500; opacity: 0; pointer-events: none; transition: all 0.25s ease;
+    display: flex; align-items: center; gap: 8px; z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast .dot { width: 7px; height: 7px; border-radius: 50%; background: #4BA987; }
+
+  .section { display: none; }
+  .section.active { display: block; animation: fadein 0.2s ease; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { flex-direction: row; overflow-x: auto; padding: 16px; }
+    .nav { flex-direction: row; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .stat-card:nth-child(2) { border-right: none; }
+    .board { grid-template-columns: 1fr; }
+    .main { padding: 24px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">AI</div>
+      <div class="txt">
+        <div class="l1 disp">Employee OS</div>
+        <div class="l2">CRM Register</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-item active" data-view="overview"><span class="idx">01</span>Overview</div>
+      <div class="nav-item" data-view="customers"><span class="idx">02</span>Customers<span class="count" id="nav-count-customers">0</span></div>
+      <div class="nav-item" data-view="pipeline"><span class="idx">03</span>Pipeline<span class="count" id="nav-count-leads">0</span></div>
+      <div class="nav-item" data-view="tasks"><span class="idx">04</span>Tasks<span class="count" id="nav-count-tasks">0</span></div>
+    </nav>
+    <div class="sidebar-footer">
+      <div><span class="status-dot wait" id="conn-dot"></span><span id="conn-text">Checking connection…</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <section class="section active" id="view-overview">
+      <div class="page-header">
+        <div>
+          <div class="eyebrow">Ledger — 01</div>
+          <h1 class="disp">Overview</h1>
+          <p>A snapshot of customers, leads, and open work across the pipeline.</p>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="label">Customers</div>
+          <div class="value mono" id="stat-customers">—</div>
+          <div class="sub">total on record</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Open leads</div>
+          <div class="value mono" id="stat-leads">—</div>
+          <div class="sub">not yet closed</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Open tasks</div>
+          <div class="value mono" id="stat-tasks">—</div>
+          <div class="sub">pending or in progress</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Closed deals</div>
+          <div class="value mono" id="stat-closed">—</div>
+          <div class="sub">leads marked closed</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2 class="disp">Recent customers</h2></div>
+        <div id="overview-recent"></div>
+      </div>
+    </section>
+
+    <section class="section" id="view-customers">
+      <div class="page-header">
+        <div>
+          <div class="eyebrow">Ledger — 02</div>
+          <h1 class="disp">Customers</h1>
+          <p>Every contact and company your team is tracking.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCustomerModal()">+ Add customer</button>
+      </div>
+      <div class="panel">
+        <div id="customers-table"></div>
+      </div>
+    </section>
+
+    <section class="section" id="view-pipeline">
+      <div class="page-header">
+        <div>
+          <div class="eyebrow">Ledger — 03</div>
+          <h1 class="disp">Sales pipeline</h1>
+          <p>Move a lead's stage forward as it progresses toward close.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openLeadModal()">+ Add lead</button>
+      </div>
+      <div class="board" id="pipeline-board"></div>
+    </section>
+
+    <section class="section" id="view-tasks">
+      <div class="page-header">
+        <div>
+          <div class="eyebrow">Ledger — 04</div>
+          <h1 class="disp">Tasks</h1>
+          <p>What the team needs to follow up on.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-ghost" onclick="runReminders()">Run AI reminders</button>
+          <button class="btn btn-primary" onclick="openTaskModal()">+ Add task</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div id="tasks-table"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="overlay" id="customer-overlay">
+  <div class="modal">
+    <h3 class="disp">Add customer</h3>
+    <p class="hint">Create a new contact in the CRM.</p>
+    <div class="modal-error" id="customer-error"></div>
+    <div class="field"><label>Customer name *</label><input id="c-name" placeholder="e.g. Ali Raza"></div>
+    <div class="field"><label>Email</label><input id="c-email" placeholder="ali@example.com"></div>
+    <div class="field"><label>Phone</label><input id="c-phone" placeholder="03001234567"></div>
+    <div class="field"><label>Company</label><input id="c-company" placeholder="Raza Traders"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('customer-overlay')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCustomer()">Save customer</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="lead-overlay">
+  <div class="modal">
+    <h3 class="disp">Add lead</h3>
+    <p class="hint">Attach a new opportunity to an existing customer.</p>
+    <div class="modal-error" id="lead-error"></div>
+    <div class="field"><label>Customer *</label><select id="l-customer"></select></div>
+    <div class="field"><label>Source</label><input id="l-source" placeholder="website, referral, walk-in…"></div>
+    <div class="field"><label>Assigned to</label><input id="l-assigned" placeholder="e.g. Ayesha"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('lead-overlay')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitLead()">Save lead</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="meeting-overlay">
+  <div class="modal">
+    <h3 class="disp">Schedule meeting</h3>
+    <p class="hint" id="meeting-modal-sub">Creates a Google Calendar event for this lead.</p>
+    <div class="modal-error" id="meeting-error"></div>
+    <div class="field"><label>Title *</label><input id="m-title" placeholder="e.g. Pricing discussion — Ali Raza"></div>
+    <div class="field"><label>Date &amp; time *</label><input type="datetime-local" id="m-start"></div>
+    <div class="field"><label>Duration (minutes)</label><input type="number" id="m-duration" value="30" min="5" step="5"></div>
+    <div class="field"><label>Notes</label><input id="m-notes" placeholder="Optional notes for this meeting"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('meeting-overlay')">Cancel</button>
+      <button class="btn btn-primary" id="meeting-save-btn" onclick="submitMeeting()">Schedule meeting</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="task-overlay">
+  <div class="modal">
+    <h3 class="disp" id="task-modal-title">Add task</h3>
+    <p class="hint">Create a follow-up or internal task.</p>
+    <div class="modal-error" id="task-error"></div>
+    <div class="field"><label>Title *</label><input id="t-title" placeholder="e.g. Follow up with Ali about order"></div>
+    <div class="field"><label>Assigned to</label><input id="t-assigned" placeholder="e.g. Ayesha"></div>
+    <div class="field"><label>Priority</label>
+      <select id="t-priority"><option>Low</option><option selected>Medium</option><option>High</option></select>
+    </div>
+    <div class="field"><label>Deadline</label><input type="date" id="t-deadline"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('task-overlay')">Cancel</button>
+      <button class="btn btn-primary" id="task-save-btn" onclick="submitTask()">Save task</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="timeline-overlay">
+  <div class="modal" style="width:460px;">
+    <h3 class="disp" id="timeline-modal-title">Activity timeline</h3>
+    <p class="hint" id="timeline-modal-sub">Every interaction logged for this customer.</p>
+    <div class="modal-error" id="timeline-error"></div>
+
+    <div class="timeline-list" id="timeline-list"></div>
+
+    <div class="field"><label>Type</label>
+      <select id="a-type">
+        <option>Email</option>
+        <option>Call</option>
+        <option>Meeting</option>
+        <option>Note</option>
+      </select>
+    </div>
+    <div class="field"><label>Description</label><input id="a-description" placeholder="e.g. Sent quotation for 25 laptops"></div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('timeline-overlay')">Close</button>
+      <button class="btn btn-primary" onclick="submitActivity()">Log activity</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="dot"></span><span id="toast-text"></span></div>
+
+<script>
+const API = "http://127.0.0.1:8000/api/crm";
+let customers = [], leads = [], tasks = [];
+
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('view-' + el.dataset.view).classList.add('active');
+  });
+});
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.querySelector('.dot').style.background = isError ? '#C15B45' : '#4BA987';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+  document.querySelectorAll('.modal-error').forEach(e => e.style.display = 'none');
+}
+
+async function apiGet(path) {
+  const res = await fetch(API + path);
+  if (!res.ok) throw new Error('Request failed: ' + res.status);
+  return res.json();
+}
+async function apiPost(path, body) {
+  const res = await fetch(API + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Request failed: ' + res.status);
+  }
+  return res.json();
+}
+async function apiPatch(path, body) {
+  const res = await fetch(API + path, {
+    method: 'PATCH',
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) throw new Error('Request failed: ' + res.status);
+  return res.json();
+}
+async function apiPostNoBody(path) {
+  const res = await fetch(API + path, { method: 'POST' });
+  if (!res.ok) throw new Error('Request failed: ' + res.status);
+  return res.json();
+}
+async function apiDelete(path) {
+  const res = await fetch(API + path, { method: 'DELETE' });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Request failed: ' + res.status);
+  }
+}
+
+async function loadAll() {
+  try {
+    customers = await apiGet('/customers?limit=200');
+    document.getElementById('conn-dot').className = 'status-dot ok';
+    document.getElementById('conn-text').textContent = 'Connected';
+  } catch (e) {
+    document.getElementById('conn-dot').className = 'status-dot err';
+    document.getElementById('conn-text').textContent = 'Server not reachable';
+    showToast('Could not reach the CRM server. Is uvicorn running?', true);
+    return;
+  }
+
+  const statuses = ['New', 'Contacted', 'Negotiation', 'Closed'];
+  const leadLists = await Promise.all(statuses.map(s =>
+    apiGet('/leads?status_filter=' + encodeURIComponent(s)).catch(() => [])
+  ));
+  leads = leadLists.flat();
+
+  tasks = await apiGet('/tasks?limit=200').catch(() => []);
+
+  renderAll();
+}
+
+function customerName(id) {
+  const c = customers.find(c => c.id === id);
+  return c ? c.customer_name : ('#' + id);
+}
+
+function renderOverview() {
+  document.getElementById('stat-customers').textContent = customers.length;
+  document.getElementById('stat-leads').textContent = leads.filter(l => l.status !== 'Closed').length;
+  document.getElementById('stat-tasks').textContent = tasks.filter(t => t.status !== 'Done').length;
+  document.getElementById('stat-closed').textContent = leads.filter(l => l.status === 'Closed').length;
+
+  const recent = [...customers].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5);
+  const box = document.getElementById('overview-recent');
+  if (recent.length === 0) {
+    box.innerHTML = emptyState('No customers yet', 'Add your first customer from the Customers tab.');
+    return;
+  }
+  box.innerHTML = `<table>
+    <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Added</th></tr></thead>
+    <tbody>${recent.map(c => `
+      <tr>
+        <td class="cell-name">${esc(c.customer_name)}</td>
+        <td class="cell-muted">${esc(c.company || '—')}</td>
+        <td class="cell-muted">${esc(c.email || '—')}</td>
+        <td class="cell-mono">${fmtDate(c.created_at)}</td>
+      </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+function renderCustomers() {
+  document.getElementById('nav-count-customers').textContent = customers.length;
+  const box = document.getElementById('customers-table');
+  if (customers.length === 0) {
+    box.innerHTML = emptyState('No customers yet', 'Click "Add customer" to create your first record.');
+    return;
+  }
+  box.innerHTML = `<table>
+    <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Phone</th><th>ID</th><th></th></tr></thead>
+    <tbody>${customers.map(c => `
+      <tr>
+        <td class="cell-name">${esc(c.customer_name)}</td>
+        <td class="cell-muted">${esc(c.company || '—')}</td>
+        <td class="cell-muted">${esc(c.email || '—')}</td>
+        <td class="cell-muted">${esc(c.phone || '—')}</td>
+        <td class="cell-mono">#${c.id}</td>
+        <td>
+          <button class="edit-link" onclick="openTimelineModal(${c.id})">Timeline</button>
+          <button class="edit-link" style="margin-left:10px;" onclick="openCustomerModal(${c.id})">Edit</button>
+          <button class="edit-link" style="color:#C15B45;margin-left:10px;" onclick="deleteCustomer(${c.id})">Delete</button>
+        </td>
+      </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+async function deleteCustomer(customerId) {
+  if (!confirm('Delete this customer? This will also remove their leads and activity history.')) return;
+  try {
+    await apiDelete('/customers/' + customerId);
+    showToast('Customer deleted');
+    await loadAll();
+  } catch (e) {
+    showToast(e.message, true);
+  }
+}
+
+const STAGES = ['New', 'Contacted', 'Negotiation', 'Closed'];
+const STAGE_CLASS = { New: 'new', Contacted: 'contacted', Negotiation: 'negotiation', Closed: 'closed' };
+
+function renderPipeline() {
+  document.getElementById('nav-count-leads').textContent = leads.length;
+  const board = document.getElementById('pipeline-board');
+  board.innerHTML = STAGES.map(stage => {
+    const stageLeads = leads.filter(l => l.status === stage);
+    return `
+      <div class="board-col">
+        <div class="board-col-head col-top-${STAGE_CLASS[stage]}">
+          <span class="title">${stage}</span>
+          <span class="n mono">${stageLeads.length}</span>
+        </div>
+        <div class="board-col-body">
+          ${stageLeads.length === 0 ? `<div style="padding:16px 4px;color:var(--ink-faint);font-size:12px;">No leads here</div>` :
+            stageLeads.map(l => `
+              <div class="lead-card">
+                <div class="lname">${esc(customerName(l.customer_id))}</div>
+                <div class="lmeta">${esc(l.source || 'no source')} · ${esc(l.assigned_to || 'unassigned')}</div>
+                <select onchange="moveLead(${l.id}, this.value)">
+                  ${STAGES.map(s => `<option value="${s}" ${s === l.status ? 'selected' : ''}>${s}</option>`).join('')}
+                </select>
+                <button class="edit-link" style="margin-top:6px;" onclick="openLeadEditModal(${l.id})">Edit details</button>
+                <button class="edit-link" style="margin-top:6px;margin-left:10px;" onclick="openMeetingModal(${l.id}, ${l.customer_id})">Schedule meeting</button>
+                <button class="edit-link" style="margin-top:6px;color:#C15B45;margin-left:10px;" onclick="deleteLead(${l.id})">Delete</button>
+              </div>`).join('')
+          }
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function moveLead(leadId, newStatus) {
+  try {
+    await apiPatch(`/leads/${leadId}/status?new_status=${encodeURIComponent(newStatus)}`);
+    showToast('Lead moved to ' + newStatus);
+    await loadAll();
+  } catch (e) {
+    showToast(e.message, true);
+  }
+}
+
+async function deleteLead(leadId) {
+  if (!confirm('Delete this lead?')) return;
+  try {
+    await apiDelete('/leads/' + leadId);
+    showToast('Lead deleted');
+    await loadAll();
+  } catch (e) {
+    showToast(e.message, true);
+  }
+}
+
+let meetingLeadId = null;
+let meetingCustomerId = null;
+
+function openMeetingModal(leadId, customerId) {
+  meetingLeadId = leadId;
+  meetingCustomerId = customerId;
+  document.getElementById('meeting-modal-sub').textContent =
+    `Creates a Google Calendar event for ${customerName(customerId)}.`;
+  document.getElementById('m-title').value = '';
+  document.getElementById('m-start').value = '';
+  document.getElementById('m-duration').value = 30;
+  document.getElementById('m-notes').value = '';
+  document.getElementById('meeting-error').style.display = 'none';
+  document.getElementById('meeting-overlay').classList.add('show');
+}
+
+async function submitMeeting() {
+  const errorEl = document.getElementById('meeting-error');
+  const title = document.getElementById('m-title').value.trim();
+  const startLocal = document.getElementById('m-start').value;
+  const duration = parseInt(document.getElementById('m-duration').value, 10) || 30;
+  const notes = document.getElementById('m-notes').value.trim();
+
+  if (!title || !startLocal) {
+    errorEl.textContent = 'Title and date/time are required.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const startIso = new Date(startLocal).toISOString();
+  const btn = document.getElementById('meeting-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Scheduling…';
+
+  try {
+    const event = await apiPost(`/leads/${meetingLeadId}/schedule-meeting`, {
+      title,
+      start_time: startIso,
+      duration_minutes: duration,
+      customer_id: meetingCustomerId,
+      notes
+    });
+    closeModal('meeting-overlay');
+    showToast('Meeting scheduled on Google Calendar');
+    if (event && event.htmlLink) {
+      window.open(event.htmlLink, '_blank');
+    }
+    await loadAll();
+  } catch (e) {
+    errorEl.textContent = e.message || 'Could not schedule meeting.';
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Schedule meeting';
+  }
+}
+
+function renderTasks() {
+  document.getElementById('nav-count-tasks').textContent = tasks.filter(t => t.status !== 'Done').length;
+  const box = document.getElementById('tasks-table');
+  if (tasks.length === 0) {
+    box.innerHTML = emptyState('No tasks yet', 'Click "Add task" to create your first one.');
+    return;
+  }
+  const sorted = [...tasks].sort((a, b) => {
+    const order = { High: 0, Medium: 1, Low: 2 };
+    return order[a.priority] - order[b.priority];
+  });
+  box.innerHTML = `<table>
+    <thead><tr><th>Task</th><th>Assigned to</th><th>Priority</th><th>Deadline</th><th>Status</th><th></th></tr></thead>
+    <tbody>${sorted.map(t => `
+      <tr>
+        <td class="cell-name">${esc(t.title)}</td>
+        <td class="cell-muted">${esc(t.assigned_to || '—')}</td>
+        <td>${pill(t.priority)}</td>
+        <td class="cell-mono">${t.deadline ? fmtDate(t.deadline) : '—'}</td>
+        <td>
+          <select onchange="moveTask(${t.id}, this.value)" style="font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid var(--line-strong);font-family:'Inter';background:#fff;">
+            ${['Pending', 'In-Progress', 'Done'].map(s => `<option value="${s}" ${s === t.status ? 'selected' : ''}>${s}</option>`).join('')}
+          </select>
+        </td>
+        <td><button class="edit-link" onclick="openTaskEditModal(${t.id})">Edit</button> <button class="edit-link" style="color:#C15B45;margin-left:14px;" onclick="deleteTask(${t.id})">Delete</button></td>
+      </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+async function moveTask(taskId, newStatus) {
+  try {
+    await apiPatch(`/tasks/${taskId}/status?new_status=${encodeURIComponent(newStatus)}`);
+    showToast('Task updated to ' + newStatus);
+    await loadAll();
+  } catch (e) {
+    showToast(e.message, true);
+  }
+}
+
+async function runReminders() {
+  try {
+    const result = await apiPostNoBody('/reminders/run');
+    const n = result.reminders_created || 0;
+    showToast(n > 0 ? `Created ${n} reminder task(s) for stale leads` : 'No stale leads right now — nothing to remind');
+    await loadAll();
+  } catch (e) {
+    showToast('Could not run reminders: ' + e.message, true);
+  }
+}
+
+async function deleteTask(taskId) {
+  if (!confirm('Delete this task?')) return;
+  try {
+    await apiDelete('/tasks/' + taskId);
+    showToast('Task deleted');
+    await loadAll();
+  } catch (e) {
+    showToast(e.message, true);
+  }
+}
+
+function renderAll() {
+  renderOverview();
+  renderCustomers();
+  renderPipeline();
+  renderTasks();
+}
+
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+function fmtDate(iso) {
+  try { return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); }
+  catch { return iso; }
+}
+function fmtDateTime(iso) {
+  try { return new Date(iso).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); }
+  catch { return iso; }
+}
+function pill(value) {
+  const cls = { High: 'pill-high', Medium: 'pill-medium', Low: 'pill-low' };
+  return `<span class="pill ${cls[value] || 'pill-low'}">${esc(value)}</span>`;
+}
+function activityPill(type) {
+  const cls = { Email: 'pill-new', Call: 'pill-contacted', Meeting: 'pill-negotiation', Note: 'pill-low' };
+  return `<span class="pill ${cls[type] || 'pill-low'}">${esc(type)}</span>`;
+}
+function emptyState(title, sub) {
+  return `<div class="empty-state"><div class="mark mono">— · —</div><p class="t">${title}</p><p class="s">${sub}</p></div>`;
+}
+
+let editingCustomerId = null;
+
+function openCustomerModal(customerId) {
+  editingCustomerId = customerId || null;
+  const modalTitleEl = document.querySelector('#customer-overlay h3');
+  const saveBtn = document.querySelector('#customer-overlay .btn-primary');
+
+  if (editingCustomerId) {
+    const c = customers.find(c => c.id === editingCustomerId);
+    document.getElementById('c-name').value = c.customer_name || '';
+    document.getElementById('c-email').value = c.email || '';
+    document.getElementById('c-phone').value = c.phone || '';
+    document.getElementById('c-company').value = c.company || '';
+    modalTitleEl.textContent = 'Edit customer';
+    saveBtn.textContent = 'Save changes';
+  } else {
+    document.getElementById('c-name').value = '';
+    document.getElementById('c-email').value = '';
+    document.getElementById('c-phone').value = '';
+    document.getElementById('c-company').value = '';
+    modalTitleEl.textContent = 'Add customer';
+    saveBtn.textContent = 'Save customer';
+  }
+  document.getElementById('customer-error').style.display = 'none';
+  document.getElementById('customer-overlay').classList.add('show');
+}
+async function submitCustomer() {
+  const name = document.getElementById('c-name').value.trim();
+  const errBox = document.getElementById('customer-error');
+  errBox.style.display = 'none';
+  if (!name) { errBox.textContent = 'Customer name is required.'; errBox.style.display = 'block'; return; }
+  const payload = {
+    customer_name: name,
+    email: document.getElementById('c-email').value.trim() || null,
+    phone: document.getElementById('c-phone').value.trim() || null,
+    company: document.getElementById('c-company').value.trim() || null
+  };
+  try {
+    if (editingCustomerId) {
+      await apiPatch('/customers/' + editingCustomerId, payload);
+      showToast('Customer updated');
+    } else {
+      await apiPost('/customers', payload);
+      showToast('Customer added');
+    }
+    closeModal('customer-overlay');
+    await loadAll();
+  } catch (e) {
+    errBox.textContent = e.message; errBox.style.display = 'block';
+  }
+}
+
+let editingLeadId = null;
+
+function openLeadModal() {
+  editingLeadId = null;
+  const sel = document.getElementById('l-customer');
+  sel.disabled = false;
+  sel.innerHTML = customers.length
+    ? customers.map(c => `<option value="${c.id}">${esc(c.customer_name)}</option>`).join('')
+    : `<option value="">No customers yet — add one first</option>`;
+  document.getElementById('l-source').value = '';
+  document.getElementById('l-assigned').value = '';
+  document.querySelector('#lead-overlay h3').textContent = 'Add lead';
+  document.querySelector('#lead-overlay .btn-primary').textContent = 'Save lead';
+  document.getElementById('lead-error').style.display = 'none';
+  document.getElementById('lead-overlay').classList.add('show');
+}
+
+function openLeadEditModal(leadId) {
+  editingLeadId = leadId;
+  const lead = leads.find(l => l.id === leadId);
+  const sel = document.getElementById('l-customer');
+  sel.innerHTML = `<option value="${lead.customer_id}">${esc(customerName(lead.customer_id))}</option>`;
+  sel.disabled = true; // which customer a lead belongs to isn't changed here — just its details
+  document.getElementById('l-source').value = lead.source || '';
+  document.getElementById('l-assigned').value = lead.assigned_to || '';
+  document.querySelector('#lead-overlay h3').textContent = 'Edit lead';
+  document.querySelector('#lead-overlay .btn-primary').textContent = 'Save changes';
+  document.getElementById('lead-error').style.display = 'none';
+  document.getElementById('lead-overlay').classList.add('show');
+}
+
+async function submitLead() {
+  const errBox = document.getElementById('lead-error');
+  errBox.style.display = 'none';
+
+  if (editingLeadId) {
+    try {
+      await apiPatch('/leads/' + editingLeadId, {
+        source: document.getElementById('l-source').value.trim() || null,
+        assigned_to: document.getElementById('l-assigned').value.trim() || null
+      });
+      closeModal('lead-overlay');
+      showToast('Lead updated');
+      await loadAll();
+    } catch (e) {
+      errBox.textContent = e.message; errBox.style.display = 'block';
+    }
+    return;
+  }
+
+  const customerId = document.getElementById('l-customer').value;
+  if (!customerId) { errBox.textContent = 'Add a customer first.'; errBox.style.display = 'block'; return; }
+  try {
+    await apiPost('/leads', {
+      customer_id: parseInt(customerId),
+      source: document.getElementById('l-source').value.trim() || null,
+      status: 'New',
+      assigned_to: document.getElementById('l-assigned').value.trim() || null
+    });
+    closeModal('lead-overlay');
+    showToast('Lead added to pipeline');
+    await loadAll();
+  } catch (e) {
+    errBox.textContent = e.message; errBox.style.display = 'block';
+  }
+}
+
+let editingTaskId = null;
+
+function openTaskModal() {
+  editingTaskId = null;
+  document.getElementById('t-title').value = '';
+  document.getElementById('t-assigned').value = '';
+  document.getElementById('t-priority').value = 'Medium';
+  document.getElementById('t-deadline').value = '';
+  document.getElementById('task-modal-title').textContent = 'Add task';
+  document.getElementById('task-save-btn').textContent = 'Save task';
+  document.getElementById('task-error').style.display = 'none';
+  document.getElementById('task-overlay').classList.add('show');
+}
+
+function openTaskEditModal(taskId) {
+  editingTaskId = taskId;
+  const t = tasks.find(t => t.id === taskId);
+  document.getElementById('t-title').value = t.title || '';
+  document.getElementById('t-assigned').value = t.assigned_to || '';
+  document.getElementById('t-priority').value = t.priority || 'Medium';
+  document.getElementById('t-deadline').value = t.deadline ? t.deadline.split('T')[0] : '';
+  document.getElementById('task-modal-title').textContent = 'Edit task';
+  document.getElementById('task-save-btn').textContent = 'Save changes';
+  document.getElementById('task-error').style.display = 'none';
+  document.getElementById('task-overlay').classList.add('show');
+}
+
+async function submitTask() {
+  const errBox = document.getElementById('task-error');
+  errBox.style.display = 'none';
+  const title = document.getElementById('t-title').value.trim();
+  if (!title) { errBox.textContent = 'Task title is required.'; errBox.style.display = 'block'; return; }
+  try {
+    const deadlineVal = document.getElementById('t-deadline').value || null;
+    if (editingTaskId) {
+      await apiPatch('/tasks/' + editingTaskId, {
+        title,
+        assigned_to: document.getElementById('t-assigned').value.trim() || null,
+        priority: document.getElementById('t-priority').value,
+        deadline: deadlineVal
+      });
+      showToast('Task updated');
+    } else {
+      await apiPost('/tasks', {
+        title,
+        assigned_to: document.getElementById('t-assigned').value.trim() || null,
+        priority: document.getElementById('t-priority').value,
+        status: 'Pending',
+        deadline: deadlineVal
+      });
+      showToast('Task added');
+    }
+    closeModal('task-overlay');
+    await loadAll();
+  } catch (e) {
+    errBox.textContent = e.message; errBox.style.display = 'block';
+  }
+}
+
+let timelineCustomerId = null;
+
+async function openTimelineModal(customerId) {
+  timelineCustomerId = customerId;
+  const c = customers.find(c => c.id === customerId);
+  document.getElementById('timeline-modal-sub').textContent = c
+    ? c.customer_name + ' — every interaction logged, most recent first.'
+    : 'Every interaction logged for this customer.';
+  document.getElementById('a-type').value = 'Email';
+  document.getElementById('a-description').value = '';
+  document.getElementById('timeline-error').style.display = 'none';
+  document.getElementById('timeline-overlay').classList.add('show');
+  await loadTimeline();
+}
+
+async function loadTimeline() {
+  const box = document.getElementById('timeline-list');
+  box.innerHTML = `<div class="timeline-loading">Loading…</div>`;
+  try {
+    const activities = await apiGet(`/customers/${timelineCustomerId}/timeline`);
+    if (activities.length === 0) {
+      box.innerHTML = `<div class="timeline-empty">No activity logged yet for this customer.</div>`;
+      return;
+    }
+    box.innerHTML = activities.map(a => `
+      <div class="timeline-item">
+        <div class="timeline-item-head">
+          ${activityPill(a.type)}
+          <span class="cell-mono">${fmtDateTime(a.timestamp)}</span>
+        </div>
+        <div class="timeline-item-desc">${esc(a.description)}</div>
+      </div>`).join('');
+  } catch (e) {
+    box.innerHTML = `<div class="timeline-error">Could not load the timeline. Is the server running?</div>`;
+  }
+}
+
+async function submitActivity() {
+  const errBox = document.getElementById('timeline-error');
+  errBox.style.display = 'none';
+  const description = document.getElementById('a-description').value.trim();
+  if (!description) { errBox.textContent = 'Description is required.'; errBox.style.display = 'block'; return; }
+  try {
+    await apiPost('/activities', {
+      customer_id: timelineCustomerId,
+      type: document.getElementById('a-type').value,
+      description
+    });
+    document.getElementById('a-description').value = '';
+    showToast('Activity logged');
+    await loadTimeline();
+  } catch (e) {
+    errBox.textContent = e.message; errBox.style.display = 'block';
+  }
+}
+
+loadAll();
+</script>
+</body>
+</html>

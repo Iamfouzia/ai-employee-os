@@ -1,0 +1,57 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Testing and linting
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables and secrets
+.env
+.env.*
+*.env
+.secrets/
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build and packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logging
+*.log
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Database and ML artifacts
+*.sqlite3
+*.db
+chroma_store/
+models/*.bin
+models/*.pt
+models/*.safetensors
+models/*.onnx
+
+# Frontend
+node_modules/
+.next/
