@@ -596,7 +596,7 @@ If no license is currently specified, usage and redistribution should be discuss
 
 GitHub Repository:
 
-https://github.com/Ammarawan123/ai-employee-os
+https://github.com/Iamfouzia/ai-employee-os
 
 ---
 
